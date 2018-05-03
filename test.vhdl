@@ -13,22 +13,26 @@ architecture testarch of readfile is
 begin
   process (rst, clk)
     file fp : text;
-    variable val : character;
     variable line_buf : line;
     variable i : integer;
     variable char : character := '0';
+    variable cnt : integer := 0;
   begin
   	if rst = '1' then
 			file_open(fp, "test.txt", READ_MODE);
 		elsif rising_edge(clk) then
+			while(cnt = 0) loop
+				readline(fp, line_buf);
+				read(line_buf, char);
 			
-			char := val;
-			if(char = '0') then
-				o <= '0';
-			else
-				o <= '1';
-			end if;
+				if(char = '0') then
+					o <= '0';
+				else
+					o <= '1';
+				end if;
+				cnt := 1;
+			end loop;
+			file_close(fp);
 		end if;
-		file_close(fp);
   end process;
 end testarch;

@@ -1,7 +1,7 @@
 v 3
-file . "test.vhdl" "20180503034958.000" "20180503115000.510":
-  entity readfile at 1( 0) + 0 on 97;
-  architecture testarch of readfile at 12( 189) + 0 on 98;
-file . "test_tb.vhdl" "20180503034936.000" "20180503115000.490":
-  entity test_tb at 1( 0) + 0 on 95;
-  architecture test_tb_arch of test_tb at 9( 144) + 0 on 96;
+file . "test_tb.vhdl" "20180503034936.000" "20180503122202.110":
+  entity test_tb at 1( 0) + 0 on 141;
+  architecture test_tb_arch of test_tb at 9( 144) + 0 on 142;
+file . "test.vhdl" "20180503042102.000" "20180503122202.128":
+  entity readfile at 1( 0) + 0 on 143;
+  architecture testarch of readfile at 12( 189) + 0 on 144;
