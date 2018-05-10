@@ -7,22 +7,20 @@ entity test_tb is
 end entity test_tb;
 
 architecture test_tb_arch of test_tb is
-  signal rst : std_logic := '1';
   signal clk : std_logic := '0';
   signal o : std_logic;
   
   signal pc0, pc1, pc2, pc3 : std_logic := '0';
   
   component readfile is
-  	port(rst, clk : in std_logic;
-  			 o : out std_logic
+  	port(clk : in std_logic;
+  			   o : out std_logic
   	);
   end component readfile;
   
   
 begin
-  test1 : component readfile port map(rst, clk, o);
-  rst <= not rst after INTERVAL;
+  test1 : component readfile port map(clk, o);
   clk <= not clk after INTERVAL;
   
   main : process is
