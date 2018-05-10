@@ -25,10 +25,11 @@ begin
 		file_open(fp, "test.txt", READ_MODE);
 	end if;
 	if rising_edge(clk) then
-		while(cnt < 15) loop
+		if(cnt < 15) then
 			if(cnt2 = 14) then
 				readline(fp, line_buf);
 				cnt2 := 0;
+				cnt := cnt + 1;
 			else
 				read(line_buf, char);
 				read(line_buf, space);
@@ -41,9 +42,9 @@ begin
 					o <= '1';
 				end if;
 			end if;
-			cnt := cnt + 1;
-		end loop;
-		file_close(fp);
+		else
+			file_close(fp);
+		end if;
 	end if;
   end process;
 end testarch;
