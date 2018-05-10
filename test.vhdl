@@ -14,6 +14,7 @@ begin
     file fp : text;
     variable line_buf : line := null;
     variable i : integer;
+    variable instr : std_logic_vector(3 downto 0);
     variable char : character := '0';
     variable space : character;
     variable init : integer := 0;
@@ -25,15 +26,32 @@ begin
 		file_open(fp, "test.txt", READ_MODE);
 	end if;
 	if rising_edge(clk) then
-		while(cnt < 15) loop
+		if(cnt < 16) then
 			if(cnt2 = 14) then
 				readline(fp, line_buf);
 				cnt2 := 0;
+				cnt := cnt + 1;
 			else
 				read(line_buf, char);
 				read(line_buf, space);
+
+				if(cnt2 < 4) then
+					case char is
+						when '0' =>
+							instr(cnt2) := '0';
+						when others =>
+							instr(cnt2) := '1';
+					end case;
+				elsif(cnt2 = 4) then
+					case instr is
+						when "0000" =>
+							report "LOAD instruction";
+						when others =>
+							report "No instruction";
+					end case;
+				end if;
+
 				cnt2 := cnt2 + 1;
-				report character'image(char);
 		
 				if(char = '0') then
 					o <= '0';
@@ -41,9 +59,9 @@ begin
 					o <= '1';
 				end if;
 			end if;
-			cnt := cnt + 1;
-		end loop;
-		file_close(fp);
+		else
+			file_close(fp);
+		end if;
 	end if;
   end process;
 end testarch;
