@@ -45,7 +45,27 @@ begin
 				elsif(cnt2 = 4) then
 					case instr is
 						when "0000" =>
-							report "LOAD instruction";
+							report "LOAD";
+						when "0001" =>
+							report "ADD_R";
+						when "0010" =>
+							report "ADD_I";
+						when "0011" =>
+							report "SUB_R";
+						when "0100" =>
+							report "SUB_I";
+						when "0101" =>
+							report "MUL_R";
+						when "0110" =>
+							report "MUL_I";
+						when "0111" =>
+							report "DIV_R";
+						when "1000" =>
+							report "DIV_I";
+						when "1001" =>
+							report "MOD_R";
+						when "1010" =>
+							report "MOD_I";	
 						when others =>
 							report "No instruction";
 					end case;
