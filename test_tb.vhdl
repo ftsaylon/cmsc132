@@ -3,11 +3,23 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity test_tb is
-	constant INTERVAL : time := 5 ns;
+  constant INTERVAL : time := 5 ns;
+  constant INTERVAL_0 : time := 15 ns;
+  constant INTERVAL_1 : time := 5 ns;
+  constant INTERVAL_2 : time := 5 ns;
+  constant INTERVAL_3 : time := 5 ns;
 end entity test_tb;
 
 architecture test_tb_arch of test_tb is
-  signal clk : std_logic := '0';
+  signal clk : std_logic := '1';
+  signal F : std_logic;
+  signal D : std_logic;
+  signal E : std_logic;
+  signal W : std_logic;
+  signal M : std_logic;
+  signal SF : std_logic;
+  signal UF : std_logic;
+  signal OvF : std_logic;
   signal o : std_logic;
   
   signal pc0, pc1, pc2, pc3 : std_logic := '0';
@@ -22,11 +34,11 @@ architecture test_tb_arch of test_tb is
 begin
   test1 : component readfile port map(clk, o);
   clk <= not clk after INTERVAL;
-  
+
+
   main : process is
     variable error_count : integer := 0;
   begin
-  
     --for count in 0 to 3 loop
     --  i0 <= test_input(0);
     --  i1 <= test_input(1);

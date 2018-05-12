@@ -14,7 +14,10 @@ begin
     file fp : text;
     variable line_buf : line := null;
     variable i : integer;
+    variable registers : std_logic_vector(33 downto 0);
     variable instr : std_logic_vector(3 downto 0);
+    variable op1 : std_logic_vector(4 downto 0);
+    variable op2 : std_logic_vector(4 downto 0);
     variable char : character := '0';
     variable space : character;
     variable init : integer := 0;
@@ -33,7 +36,6 @@ begin
 				cnt := cnt + 1;
 			else
 				read(line_buf, char);
-				read(line_buf, space);
 
 				if(cnt2 < 4) then
 					case char is
@@ -43,6 +45,7 @@ begin
 							instr(cnt2) := '1';
 					end case;
 				elsif(cnt2 = 4) then
+					read(line_buf, space);
 					case instr is
 						when "0000" =>
 							report "LOAD";
@@ -69,6 +72,33 @@ begin
 						when others =>
 							report "No instruction";
 					end case;
+				elsif(cnt2 = 10) then
+					case char is
+						when '0' =>
+							op1(cnt2) := '0';
+						when others =>
+							op1(cnt2) := '1';
+					end case;
+					read(line_buf, space);
+					if(instr(0) = 0) then
+						--I
+
+					else 
+						--R
+					end if;
+				elsif(cnt2 = 16) then
+					case char is
+						when '0' =>
+							op2(cnt2) := '0';
+						when others =>
+							op2(cnt2) := '1';
+					end case;
+					if(instr(0) = 0) then
+						--I
+
+					else 
+						--R
+					end if;
 				end if;
 
 				cnt2 := cnt2 + 1;
