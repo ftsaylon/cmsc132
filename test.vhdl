@@ -4,20 +4,24 @@ use STD.textio.all;
 use ieee.numeric_std.all;
 
 entity readfile is
-  port(clk : in std_logic;
-		 o : out std_logic);
+	port(clk : in std_logic;
+		   o : out std_logic);
 end readfile;
 
 architecture testarch of readfile is
 begin
   process (clk)
+  	type int_array is array(0 to 31) of integer;
+  	type char4_array is array(0 to 3) of character;
+  	type char5_array is array(0 to 4) of character;
+
     file fp : text;
     variable line_buf : line := null;
     variable i : integer;
-    variable registers : std_logic_vector(33 downto 0);
-    variable instr : std_logic_vector(3 downto 0);
-    variable op1 : std_logic_vector(4 downto 0);
-    variable op2 : std_logic_vector(4 downto 0);
+    variable registers : int_array;
+    variable instr : char4_array;
+    variable op1 :  char5_array;
+    variable op2 :  char5_array;
     variable char : character := '0';
     variable space : character;
     variable init : integer := 0;
@@ -41,29 +45,20 @@ begin
 					read(line_buf, space);
 				end if;
 
-				case char is
-					when '0' =>
-						if(cnt2 < 4) then
-							instr(cnt2) := '0';
-						elsif(cnt2 < 9) then
-							op1(cnt2 - 4) := '0';
-						else
-							op2(cnt2 - 9) := '0';
-						end if;
-					when others =>
-						if(cnt2 < 4) then
-							instr(cnt2) := '1';
-						elsif(cnt2 < 9) then
-							op1(cnt2 - 4) := '1';
-						else
-							op2(cnt2 - 9) := '1';
-						end if;
-				end case;
+				if(cnt2 < 4) then
+					instr(cnt2) := char;
+				elsif(cnt2 < 9) then
+					op1(cnt2 - 4) := char;
+				else
+					op2(cnt2 - 9) := char;
+				end if;
 
-				if(cnt2 = 4) then
+				if(cnt2 = 13) then
 					case instr is
 						when "0000" =>
 							report "LOAD";
+
+
 						when "0001" =>
 							report "ADD_R";
 						when "0010" =>
