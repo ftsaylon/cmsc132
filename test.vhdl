@@ -37,15 +37,30 @@ begin
 			else
 				read(line_buf, char);
 
-				if(cnt2 < 4) then
-					case char is
-						when '0' =>
-							instr(cnt2) := '0';
-						when others =>
-							instr(cnt2) := '1';
-					end case;
-				elsif(cnt2 = 4) then
+				if(cnt2 = 3 OR cnt2 = 8) then
 					read(line_buf, space);
+				end if;
+
+				case char is
+					when '0' =>
+						if(cnt2 < 4) then
+							instr(cnt2) := '0';
+						elsif(cnt2 < 9) then
+							op1(cnt2 - 4) := '0';
+						else
+							op2(cnt2 - 9) := '0';
+						end if;
+					when others =>
+						if(cnt2 < 4) then
+							instr(cnt2) := '1';
+						elsif(cnt2 < 9) then
+							op1(cnt2 - 4) := '1';
+						else
+							op2(cnt2 - 9) := '1';
+						end if;
+				end case;
+
+				if(cnt2 = 4) then
 					case instr is
 						when "0000" =>
 							report "LOAD";
@@ -72,42 +87,23 @@ begin
 						when others =>
 							report "No instruction";
 					end case;
-				elsif(cnt2 = 10) then
-					case char is
-						when '0' =>
-							op1(cnt2) := '0';
-						when others =>
-							op1(cnt2) := '1';
-					end case;
-					read(line_buf, space);
-					if(instr(0) = 0) then
-						--I
 
+					if(instr(3) = '0') then
+						--I
+						report "Immediate";
 					else 
 						--R
-					end if;
-				elsif(cnt2 = 16) then
-					case char is
-						when '0' =>
-							op2(cnt2) := '0';
-						when others =>
-							op2(cnt2) := '1';
-					end case;
-					if(instr(0) = 0) then
-						--I
-
-					else 
-						--R
+						report "Register";
 					end if;
 				end if;
 
 				cnt2 := cnt2 + 1;
 		
-				if(char = '0') then
-					o <= '0';
-				elsif(char = '1') then
-					o <= '1';
-				end if;
+				--if(char = '0') then
+				--	o <= '0';
+				--elsif(char = '1') then
+				--	o <= '1';
+				--end if;
 			end if;
 		else
 			file_close(fp);
@@ -115,3 +111,4 @@ begin
 	end if;
   end process;
 end testarch;
+
