@@ -5,16 +5,25 @@ use ieee.numeric_std.all;
 
 entity readfile is
 	port(clk : in std_logic;
-		   o : out std_logic);
+		   F : out std_logic;
+		   D : out std_logic;
+		   E : out std_logic;
+		   W : out std_logic;
+		   M : out std_logic;
+		   SF : out std_logic;
+		   UF : out std_logic;
+		   OvF : out std_logic);
 end readfile;
 
 architecture testarch of readfile is
 begin
   process (clk)
+  	--array definitions
   	type int_array is array(0 to 31) of integer;
   	type char4_array is array(0 to 3) of character;
   	type char5_array is array(0 to 4) of character;
 
+  	--variable declarations
     file fp : text;
     variable line_buf : line := null;
     variable i : integer;
@@ -27,9 +36,9 @@ begin
     variable char : character := '0';
     variable space : character;
     variable init : integer := 0;
-    variable cnt : integer := 0;
-    variable cnt2 : integer := 14;
+    variable count1 : integer := 0;
   begin
+  	--Initilization
   	if(init = 0) then
   		init := 1;
 		file_open(fp, "test.txt", READ_MODE);
@@ -38,28 +47,34 @@ begin
 	    	registers(count) := 0;
 	    end loop;
 	end if;
+
 	if rising_edge(clk) then
-		if(cnt < 16) then
-			if(cnt2 = 14) then
-				readline(fp, line_buf);
-				cnt2 := 0;
-				cnt := cnt + 1;
-			else
+		--reads until 15 lines of input
+		if(count1 < 15) then
+
+			--reads 1 line of input per rising edge
+			readline(fp, line_buf);
+			for count2 in 0 to 13 loop
+				--catches a character
 				read(line_buf, char);
 
-				if(cnt2 = 3 OR cnt2 = 8) then
+				--catches the 2 space characters, in between the codes
+				if(count2 = 3 OR count2 = 8) then
 					read(line_buf, space);
 				end if;
 
-				if(cnt2 < 4) then
-					instr(cnt2) := char;
-				elsif(cnt2 < 9) then
-					op1(cnt2 - 4) := char;
+				--checks the current iteration count and places the bit into the proper array
+				if(count2 < 4) then
+					instr(count2) := char;
+				elsif(count2 < 9) then
+					op1(count2 - 4) := char;
 				else
-					op2(cnt2 - 9) := char;
+					op2(count2 - 9) := char;
 				end if;
 
-				if(cnt2 = 13) then
+				if(count2 = 13) then
+					--converts binary to decimal
+					--op1_val is decreased by 1 (-49 instead of -48) in order to be used as an array key
 					op1_val :=
 						16 * (character'pos(op1(0)) - 48) + 
 						8 * (character'pos(op1(1)) - 48) + 
@@ -73,69 +88,51 @@ begin
 						2 * (character'pos(op2(3)) - 48) + 
 						character'pos(op2(4)) - 48;
 
-					report integer'image(op1_val);
-					report integer'image(op2_val);
-
+					--performs the operation and stores the value into the register array
 					case instr is
 						when "0000" =>
-							report "LOAD";
-
+							--LOAD
+							F <= '1';
 							registers(op1_val) := op2_val;
 						when "0001" =>
-							report "ADD_R";
-
+							--ADD_R
 							registers(op1_val) := registers(op1_val) + registers(op2_val - 1);
 						when "0010" =>
-							report "ADD_I";
-
+							--ADD_I
 							registers(op1_val) := registers(op1_val) + op2_val;
-
-					report integer'image(registers(op1_val));
 						when "0011" =>
-							report "SUB_R";
-
+							--SUB_R
 							registers(op1_val) := registers(op1_val) - registers(op2_val - 1);
 						when "0100" =>
-							report "SUB_I";
-
+							--SUB_I
 							registers(op1_val) := registers(op1_val) - op2_val;
 						when "0101" =>
-							report "MUL_R";
-						
+							--MUL_R
 							registers(op1_val) := registers(op1_val) * registers(op2_val - 1);
 						when "0110" =>
-							report "MUL_I";
-
+							--MUL_I
 							registers(op1_val) := registers(op1_val) * op2_val;
 						when "0111" =>
-							report "DIV_R";
-						
+							--DIV_R
 							registers(op1_val) := registers(op1_val) / registers(op2_val - 1);
 						when "1000" =>
-							report "DIV_I";
-
+							--DIV_I
 							registers(op1_val) := registers(op1_val) / op2_val;
 						when "1001" =>
-							report "MOD_R";
-						
-							--registers(op1_val) := registers(op1_val) % registers(op2_val - 1);
+							--MOD_R
+							registers(op1_val) := registers(op1_val) mod registers(op2_val - 1);
 						when "1010" =>
-							report "MOD_I";	
-
-							--registers(op1_val) := registers(op1_val) % op2_val;
+							--MOD_I
+							registers(op1_val) := registers(op1_val) mod op2_val;
 						when others =>
-							report "No instruction";
+							--NO INSTRUCTION
 					end case;
 				end if;
+			end loop;
 
-				cnt2 := cnt2 + 1;
-		
-				--if(char = '0') then
-				--	o <= '0';
-				--elsif(char = '1') then
-				--	o <= '1';
-				--end if;
-			end if;
+		count1 := count1 + 1;
+
+		--closes file after reading 15 lines
 		else
 			file_close(fp);
 		end if;

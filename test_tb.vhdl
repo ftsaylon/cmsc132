@@ -4,41 +4,80 @@ use ieee.numeric_std.all;
 
 entity test_tb is
   constant INTERVAL : time := 5 ns;
-  constant INTERVAL_0 : time := 15 ns;
-  constant INTERVAL_1 : time := 5 ns;
-  constant INTERVAL_2 : time := 5 ns;
-  constant INTERVAL_3 : time := 5 ns;
 end entity test_tb;
 
 architecture test_tb_arch of test_tb is
   signal clk : std_logic := '1';
-  signal F : std_logic;
-  signal D : std_logic;
-  signal E : std_logic;
-  signal W : std_logic;
-  signal M : std_logic;
-  signal SF : std_logic;
-  signal UF : std_logic;
-  signal OvF : std_logic;
-  signal o : std_logic;
-  
+  signal F, D, E, M, W, SF, UF, OvF : std_logic;
   signal pc0, pc1, pc2, pc3 : std_logic := '0';
   
   component readfile is
-  	port(clk : in std_logic;
-  			   o : out std_logic
+  	port(
+      clk : in std_logic;
+        F : out std_logic;
+        D : out std_logic;
+        E : out std_logic;
+        W : out std_logic;
+        M : out std_logic;
+       SF : out std_logic;
+       UF : out std_logic;
+      OvF : out std_logic
   	);
   end component readfile;
   
   
 begin
-  test1 : component readfile port map(clk, o);
+  test1 : component readfile port map(clk, F, D, E, W, M, SF, UF, OvF);
   clk <= not clk after INTERVAL;
 
-
-  main : process is
+  process (clk)
+    variable val : integer := 0;
+    variable counter : integer := 1;
     variable error_count : integer := 0;
   begin
+    if(rising_edge(clk)) then
+      val := counter;
+      case (val mod 2) is
+        when 1 => pc0 <= '1';
+        when 0 => pc0 <= '0';
+      end case;
+      if(val > 0) then
+        val := val / 2;
+        case (val mod 2) is
+          when 1 => pc1 <= '1';
+          when 0 => pc1 <= '0';
+        end case;
+        if(val > 0) then
+          val := val / 2;
+          case (val mod 2) is
+            when 1 => pc2 <= '1';
+            when 0 => pc2 <= '0';
+          end case;
+          if(val > 0) then
+            val := val / 2;
+            case (val mod 2) is
+              when 1 => pc3 <= '1';
+              when 0 => pc3 <= '0';
+            end case;
+          end if;
+        end if;
+      end if;
+      counter := counter + 1;
+    else
+      if(pc0 = '1') then
+        pc0 <= '0';
+      end if;
+      if(pc1 = '1') then
+        pc1 <= '0';
+      end if;
+      if(pc2 = '1') then
+        pc2 <= '0';
+      end if;
+      if(pc3 = '1') then
+        pc3 <= '0';
+      end if;
+    end if;
+
     --for count in 0 to 3 loop
     --  i0 <= test_input(0);
     --  i1 <= test_input(1);
@@ -58,6 +97,5 @@ begin
 
     --report "Done with the test. There were " & integer'image(error_count) &
     --       " errors found.";
-    wait;
-  end process main;                    
+  end process;                    
 end architecture test_tb_arch;
