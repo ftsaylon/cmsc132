@@ -6,7 +6,7 @@ use ieee.numeric_std.all;
 entity readfile is
 	port(
 		clk : in std_logic;
-		F, D, E, W, M, SF, UF, OvF : out std_logic;
+		F, D, E, W, M, SF, UF, OvF, ZF : out std_logic;
 		pc0, pc1, pc2, pc3 : out std_logic);
 end readfile;
 
@@ -170,4 +170,3 @@ begin
 		end if;
 	end process;
 end testarch;
-
