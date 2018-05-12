@@ -22,6 +22,8 @@ begin
     variable instr : char4_array;
     variable op1 :  char5_array;
     variable op2 :  char5_array;
+    variable op1_val :  integer;
+    variable op2_val :  integer;
     variable char : character := '0';
     variable space : character;
     variable init : integer := 0;
@@ -31,6 +33,10 @@ begin
   	if(init = 0) then
   		init := 1;
 		file_open(fp, "test.txt", READ_MODE);
+
+	    for count in 0 to 31 loop
+	    	registers(count) := 0;
+	    end loop;
 	end if;
 	if rising_edge(clk) then
 		if(cnt < 16) then
@@ -54,42 +60,72 @@ begin
 				end if;
 
 				if(cnt2 = 13) then
+					op1_val :=
+						16 * (character'pos(op1(0)) - 48) + 
+						8 * (character'pos(op1(1)) - 48) + 
+						4 * (character'pos(op1(2)) - 48) + 
+						2 * (character'pos(op1(3)) - 48) + 
+						character'pos(op1(4)) - 49;
+					op2_val := 
+						16 * (character'pos(op2(0)) - 48) + 
+						8 * (character'pos(op2(1)) - 48) + 
+						4 * (character'pos(op2(2)) - 48) + 
+						2 * (character'pos(op2(3)) - 48) + 
+						character'pos(op2(4)) - 48;
+
+					report integer'image(op1_val);
+					report integer'image(op2_val);
+
 					case instr is
 						when "0000" =>
 							report "LOAD";
 
-
+							registers(op1_val) := op2_val;
 						when "0001" =>
 							report "ADD_R";
+
+							registers(op1_val) := registers(op1_val) + registers(op2_val - 1);
 						when "0010" =>
 							report "ADD_I";
+
+							registers(op1_val) := registers(op1_val) + op2_val;
+
+					report integer'image(registers(op1_val));
 						when "0011" =>
 							report "SUB_R";
+
+							registers(op1_val) := registers(op1_val) - registers(op2_val - 1);
 						when "0100" =>
 							report "SUB_I";
+
+							registers(op1_val) := registers(op1_val) - op2_val;
 						when "0101" =>
 							report "MUL_R";
+						
+							registers(op1_val) := registers(op1_val) * registers(op2_val - 1);
 						when "0110" =>
 							report "MUL_I";
+
+							registers(op1_val) := registers(op1_val) * op2_val;
 						when "0111" =>
 							report "DIV_R";
+						
+							registers(op1_val) := registers(op1_val) / registers(op2_val - 1);
 						when "1000" =>
 							report "DIV_I";
+
+							registers(op1_val) := registers(op1_val) / op2_val;
 						when "1001" =>
 							report "MOD_R";
+						
+							--registers(op1_val) := registers(op1_val) % registers(op2_val - 1);
 						when "1010" =>
 							report "MOD_I";	
+
+							--registers(op1_val) := registers(op1_val) % op2_val;
 						when others =>
 							report "No instruction";
 					end case;
-
-					if(instr(3) = '0') then
-						--I
-						report "Immediate";
-					else 
-						--R
-						report "Register";
-					end if;
 				end if;
 
 				cnt2 := cnt2 + 1;
