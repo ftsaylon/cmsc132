@@ -89,8 +89,11 @@ begin
 						case instr is
 							when "0000" =>
 								--LOAD
-								F <= '1';
 								registers(op1_val) := op2_val;
+
+								if(op2_val > 4) then
+									OvF <= 1;
+								end if;
 							when "0001" =>
 								--ADD_R
 								registers(op1_val) := registers(op1_val) + registers(op2_val - 1);
@@ -163,6 +166,10 @@ begin
 			end if;
 			counter := counter + 1;
 		else
+			SF <= '0';
+			UF <= '0';
+			OvF <= '0';
+			ZF <= '0';
 			pc0 <= '0';
 			pc1 <= '0';
 			pc2 <= '0';
