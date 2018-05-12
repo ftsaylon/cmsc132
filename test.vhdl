@@ -14,7 +14,10 @@ begin
     file fp : text;
     variable line_buf : line := null;
     variable i : integer;
+    variable registers : std_logic_vector(33 downto 0);
     variable instr : std_logic_vector(3 downto 0);
+    variable op1 : std_logic_vector(4 downto 0);
+    variable op2 : std_logic_vector(4 downto 0);
     variable char : character := '0';
     variable space : character;
     variable init : integer := 0;
@@ -33,16 +36,31 @@ begin
 				cnt := cnt + 1;
 			else
 				read(line_buf, char);
-				read(line_buf, space);
 
-				if(cnt2 < 4) then
-					case char is
-						when '0' =>
+				if(cnt2 = 3 OR cnt2 = 8) then
+					read(line_buf, space);
+				end if;
+
+				case char is
+					when '0' =>
+						if(cnt2 < 4) then
 							instr(cnt2) := '0';
-						when others =>
+						elsif(cnt2 < 9) then
+							op1(cnt2 - 4) := '0';
+						else
+							op2(cnt2 - 9) := '0';
+						end if;
+					when others =>
+						if(cnt2 < 4) then
 							instr(cnt2) := '1';
-					end case;
-				elsif(cnt2 = 4) then
+						elsif(cnt2 < 9) then
+							op1(cnt2 - 4) := '1';
+						else
+							op2(cnt2 - 9) := '1';
+						end if;
+				end case;
+
+				if(cnt2 = 4) then
 					case instr is
 						when "0000" =>
 							report "LOAD";
@@ -69,15 +87,23 @@ begin
 						when others =>
 							report "No instruction";
 					end case;
+
+					if(instr(3) = '0') then
+						--I
+						report "Immediate";
+					else 
+						--R
+						report "Register";
+					end if;
 				end if;
 
 				cnt2 := cnt2 + 1;
 		
-				if(char = '0') then
-					o <= '0';
-				elsif(char = '1') then
-					o <= '1';
-				end if;
+				--if(char = '0') then
+				--	o <= '0';
+				--elsif(char = '1') then
+				--	o <= '1';
+				--end if;
 			end if;
 		else
 			file_close(fp);
