@@ -1,0 +1,7 @@
+v 3
+file . "test_tb.vhdl" "20180513034106.000" "20180513114200.901":
+  entity test_tb at 1( 0) + 0 on 77;
+  architecture test_tb_arch of test_tb at 9( 153) + 0 on 78;
+file . "test.vhdl" "20180513034106.000" "20180513114200.901":
+  entity readfile at 1( 0) + 0 on 75;
+  architecture testarch of readfile at 13( 254) + 0 on 76;

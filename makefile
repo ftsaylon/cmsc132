@@ -1,4 +1,4 @@
-files = test.vhdl test_tb.vhdl test_tb.vcd
+files = test.vhdl test_tb.vhdl 
 
 run: $(files)
 		ghdl -a *.vhdl
@@ -8,4 +8,4 @@ run: $(files)
 wave: $(files)
 		gtkwave test.vcd
 clean:
-		rm -f test_tb
+		rm -f test_tb test.vcd 
