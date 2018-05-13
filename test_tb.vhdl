@@ -8,7 +8,7 @@ end entity test_tb;
 
 architecture test_tb_arch of test_tb is
   signal clk : std_logic := '1';
-  signal F, D, E, M, W, SF, UF, OvF, ZF : std_logic;
+  signal F, D, E, M, W, SF, UF, OvF, ZF : std_logic := '0';
   signal pc0, pc1, pc2, pc3 : std_logic := '0';
   
   component readfile is
