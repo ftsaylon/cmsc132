@@ -29,6 +29,7 @@ begin
 	    variable instr : char4_array;
 	    variable op1 :  char5_array;
 	    variable op2 :  char5_array;
+	    variable operation : integer;
 	    variable op1_val : integer;
 	    variable op2_val :  integer;
 	    variable target_register :  integer;
@@ -77,41 +78,38 @@ begin
 			--performs the operation and stores the value into the register array
 			if(do_stage(2) = true) then
 				target_register := op1_val;
-				case instr is
-					when "0000" =>
+				case operation is
+					when 0 =>
 						--LOAD
 						output_value := op2_val;
-					when "0001" =>
+					when 1 =>
 						--ADD_R
 						output_value := registers(target_register) + registers(op2_val - 1);
-					when "0010" =>
+					when 2 =>
 						--ADD_I
 						output_value := registers(target_register) + op2_val;
-					when "0011" =>
+					when 3 =>
 						--SUB_R
 						output_value := registers(target_register) - registers(op2_val - 1);
-					when "0100" =>
+					when 4 =>
 						--SUB_I
 						output_value := registers(target_register) - op2_val;
-
-						report "SUB_I ";
-						report integer'image(output_value);
-					when "0101" =>
+					when 5 =>
 						--MUL_R
 						output_value := registers(target_register) * registers(op2_val - 1);
-					when "0110" =>
+					when 6 =>
 						--MUL_I
 						output_value := registers(target_register) * op2_val;
-					when "0111" =>
+					when 7 =>
 						--DIV_R
 						output_value := registers(target_register) / registers(op2_val - 1);
-					when "1000" =>
+					when 8 =>
 						--DIV_I
 						output_value := registers(target_register) / op2_val;
-					when "1001" =>
+					when 9 =>
 						--MOD_R
 						output_value := registers(target_register) mod registers(op2_val - 1);
-					when "1010" =>
+					when 10 =>
 						--MOD_I
 						output_value := registers(target_register) mod op2_val;
 					when others =>
@@ -120,10 +118,6 @@ begin
 
 				if(output_value > 4) then
 					OvF <= '1';
-					report "OVERFLOW ";
-					report "op2 ";
-					report integer'image(op2_val);
-					report integer'image(output_value);
 				end if;
 				if(output_value >= 0) then
 					SF <= '1';
@@ -133,8 +127,6 @@ begin
 				end if;
 				if(output_value < 0) then
 					UF <= '1';
-					report "UNDERFLOW ";
-					report integer'image(output_value);
 				end if;
 
 				E <= '1';
@@ -159,6 +151,45 @@ begin
 					4 * (character'pos(op2(2)) - 48) + 
 					2 * (character'pos(op2(3)) - 48) + 
 					character'pos(op2(4)) - 48;
+
+				case instr is
+					when "0000" =>
+						--LOAD
+						operation := 0;
+					when "0001" =>
+						--ADD_R
+						operation := 1;
+					when "0010" =>
+						--ADD_I
+						operation := 2;
+					when "0011" =>
+						--SUB_R
+						operation := 3;
+					when "0100" =>
+						--SUB_I
+						operation := 4;
+					when "0101" =>
+						--MUL_R
+						operation := 5;
+					when "0110" =>
+						--MUL_I
+						operation := 6;
+					when "0111" =>
+						--DIV_R
+						operation := 7;
+					when "1000" =>
+						--DIV_I
+						operation := 8;
+					when "1001" =>
+						--MOD_R
+						operation := 9;
+					when "1010" =>
+						--MOD_I
+						operation := 10;
+					when others =>
+						--NO INSTRUCTION
+						operation := -1;
+				end case;
 				
 				D <= '1';
 				stage_checker(1) := true;
